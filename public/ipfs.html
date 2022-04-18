@@ -1,0 +1,91 @@
+<html>
+  <head>
+    <!-- Moralis SDK code -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://unpkg.com/moralis/dist/moralis.js"></script>
+  </head>
+  <body>
+    <h1>Moralis Gas Stats</h1>
+
+    <button id="btn-login">Moralis Login</button>
+    <input type="text" name="metadataName" id="metadataName" placeholder="name"><br>
+    <textarea name="metadatadescription" id="metadatadescription" cols="30" rows="10"></textarea>
+    <br><br>
+    <input type="file" name="fileInput" id="fileInput"><br><br>
+
+    <button onclick=gogogo()>Gogogo</button>
+    <button id="btn-logout">Logout</button>
+    <!-- <button id="btn-get-stats">Refresh Stats</button> -->
+
+    <script>
+      // connect to Moralis server
+      Moralis.initialize("43rs04r4TvfNLyuTk9xEa4kxkTPvxQEPoXKY9PdL");
+      Moralis.serverURL="https://iiaq9se9my82.usemoralis.com:2053/server";
+
+    
+
+      // upload an image
+
+
+      // Save file input to IPFS
+      uploadImage = async () => {
+        const data = fileInput.files[0]
+const file = new Moralis.File(data.name, data)
+await file.saveIPFS();
+console.log(file.ipfs(), file.hash());
+return file.ipfs();
+
+      }
+
+      // upload metadata object name description image
+ uploadMetadata = async (imageURL) => {
+  
+
+const name = document.getElementById('metadataName').value;
+const description = document.getElementById('metadatadescription').value;
+
+const metadata = {
+  "name":name,
+  "description":description,
+  "image":imageURL
+}
+
+const file = new Moralis.File("file.json", {base64 : btoa(JSON.stringify(metadata))});
+await file.saveIPFS();
+console.log(file.ipfs());
+ }
+      // function to gogogo
+
+      
+      gogogo = async () => {
+        const image = await uploadImage();
+        await uploadMetadata(image); 
+      }
+
+     
+      // connect to Moralis server
+      const serverUrl = "https://iiaq9se9my82.usemoralis.com:2053/server";
+      const appId = "43rs04r4TvfNLyuTk9xEa4kxkTPvxQEPoXKY9PdL";
+      Moralis.start({ serverUrl, appId });
+
+      async function login() {
+        let user = Moralis.User.current();
+        if (!user) {
+          user = await Moralis.Web3.authenticate();
+        }
+        console.log("logged in user:", user);
+        getStats();
+      }
+
+      async function logOut() {
+        await Moralis.User.logOut();
+        console.log("logged out");
+      }
+
+      // // bind button click handlers
+      document.getElementById("btn-login").onclick = login;
+       document.getElementById("btn-logout").onclick = logOut;
+     
+    </script>
+  </body>
+</html>
